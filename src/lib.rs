@@ -18,6 +18,7 @@ pub mod sections;
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
+/// Extended Information for a given file
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FileExInfo {
     /// Entry point (ELF & PE)
