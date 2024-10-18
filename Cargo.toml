@@ -2,7 +2,7 @@
 name = "file_info"
 authors = ["SG <marirs@gmail.com>"]
 description = "Provides file information for PE and ELF files"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 
 [dependencies]

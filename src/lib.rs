@@ -70,7 +70,7 @@ impl From<ElfFileInformation> for FileExInfo {
     }
 }
 
-pub fn get_file_information(file_path: &str) -> Result<FileExInfo> {
+pub fn get_file_extended_information(file_path: &str) -> Result<FileExInfo> {
     let payload = std::fs::read(file_path)?;
     match goblin::Object::parse(&payload)? {
         goblin::Object::PE(_) => {
