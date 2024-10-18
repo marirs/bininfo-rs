@@ -63,7 +63,7 @@ impl From<ElfFileInformation> for FileExInfo {
             signature: None,
             rich_headers: None,
             section_table: Some(val.section_table),
-            imports: None,
+            imports: Some(val.imports),
             resources: None,
             tls_callbacks: None,
         }
