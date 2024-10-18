@@ -1,4 +1,11 @@
-use crate::{entry_point::EntryPoint, sections::SectionTable, Result};
+use std::collections::HashMap;
+
+use crate::{
+    entry_point::EntryPoint,
+    pe::imports::{ImportEntry, ImportFunction, Imports},
+    sections::SectionTable,
+    Result,
+};
 use goblin::{
     container::{Container, Endian},
     elf,
@@ -10,6 +17,7 @@ pub struct ElfFileInformation {
     pub entry_point: EntryPoint,
     pub section_table: SectionTable,
     pub header: Header,
+    pub imports: Imports,
 }
 
 impl ElfFileInformation {
@@ -18,6 +26,40 @@ impl ElfFileInformation {
             entry_point: EntryPoint::try_from(elf_file)?,
             section_table: SectionTable::try_from(elf_file)?,
             header: Header::try_from(elf_file)?,
+            imports: Imports::try_from(elf_file)?,
+        })
+    }
+}
+
+impl TryFrom<&elf::Elf<'_>> for Imports {
+    type Error = crate::error::Error;
+    fn try_from(elf: &elf::Elf) -> std::result::Result<Self, Self::Error> {
+        let syms: HashMap<String, Vec<String>> =
+            elf.syms.iter().fold(HashMap::new(), |mut acc, sym| {
+                if sym.is_import() && sym.is_function() {
+                    if let Some(ee) = elf.strtab.get_at(sym.st_name) {
+                        if let Some((func, module)) = ee.split_once("@@") {
+                            let e = acc.entry(module.to_string()).or_insert(vec![]);
+                            e.push(func.to_string())
+                        }
+                    }
+                }
+                acc
+            });
+        Ok(Imports {
+            modules: syms
+                .into_iter()
+                .map(|(module, funcs)| ImportEntry {
+                    name: module,
+                    imports: funcs
+                        .into_iter()
+                        .map(|f| ImportFunction {
+                            name: f,
+                            import_by_ordinal: false,
+                        })
+                        .collect(),
+                })
+                .collect(),
         })
     }
 }
