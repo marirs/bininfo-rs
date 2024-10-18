@@ -1,5 +1,5 @@
 use crate::pe::util::safe_read;
-use exe::{CCharString, VecPE, PE};
+use exe::{CCharString, SectionCharacteristics, VecPE, PE};
 use goblin::elf::SectionHeader;
 use serde::{Deserialize, Serialize};
 
@@ -13,6 +13,7 @@ pub struct Section {
     #[serde(skip_serializing)]
     pub data: Vec<u8>,
     pub entropy: Option<f32>,
+    pub characteristics: Option<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
@@ -30,6 +31,11 @@ impl TryFrom<&VecPE> for SectionTable {
             let data_offset: usize = sec.data_offset(pe.get_type());
             let data_size = sec.data_size(pe.get_type());
             let section_data = safe_read(pe, data_offset, data_size);
+            let section_characteristics = format!(
+                "{:X} ({:?})",
+                sec.characteristics.bits(),
+                SectionCharacteristics::from_bits(sec.characteristics.bits()).unwrap()
+            );
 
             result.sections.push(Section {
                 name: sec.name.as_str().unwrap().to_string(),
@@ -39,6 +45,7 @@ impl TryFrom<&VecPE> for SectionTable {
                 raw_size: sec.size_of_raw_data as u64,
                 data: section_data.to_vec(),
                 entropy: Some(entropy::shannon_entropy(section_data)),
+                characteristics: Some(section_characteristics),
             });
         }
         Ok(result)
@@ -67,6 +74,7 @@ impl From<&SectionHeader> for Section {
             raw_size: section.sh_size,
             data: vec![],
             entropy: None,
+            characteristics: None,
         }
     }
 }
