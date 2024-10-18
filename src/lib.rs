@@ -1,12 +1,12 @@
-use crate::elf::ElfFileInformation;
-use crate::entry_point::EntryPoint;
-use crate::pe::imports::Imports;
-use crate::pe::resource::Resources;
-use crate::pe::rich_headers::RichTable;
-use crate::pe::signatures::PeAuthenticodes;
-use crate::pe::tls::TlsCallbacks;
-use crate::pe::PeFileInformation;
-use crate::sections::SectionTable;
+use crate::{
+    elf::ElfFileInformation,
+    entry_point::EntryPoint,
+    pe::{
+        imports::Imports, resource::Resources, rich_headers::RichTable,
+        signatures::PeAuthenticodes, tls::TlsCallbacks, PeFileInformation,
+    },
+    sections::SectionTable,
+};
 use exe::VecPE;
 use serde::{Deserialize, Serialize};
 

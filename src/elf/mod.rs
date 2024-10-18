@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::{
     entry_point::EntryPoint,
     pe::imports::{ImportEntry, ImportFunction, Imports},
@@ -11,6 +9,7 @@ use goblin::{
     elf,
 };
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct ElfFileInformation {

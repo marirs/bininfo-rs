@@ -1,12 +1,12 @@
-use crate::entry_point::EntryPoint;
-use crate::pe::hash::Hashes;
-use crate::pe::imports::Imports;
-use crate::pe::resource::Resources;
-use crate::pe::rich_headers::RichTable;
-use crate::pe::signatures::PeAuthenticodes;
-use crate::pe::tls::TlsCallbacks;
-use crate::sections::SectionTable;
-use crate::Result;
+use crate::{
+    entry_point::EntryPoint,
+    pe::{
+        hash::Hashes, imports::Imports, resource::Resources, rich_headers::RichTable,
+        signatures::PeAuthenticodes, tls::TlsCallbacks,
+    },
+    sections::SectionTable,
+    Result,
+};
 use exe::VecPE;
 use serde::{Deserialize, Serialize};
 
