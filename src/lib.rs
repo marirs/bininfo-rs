@@ -19,7 +19,7 @@ pub mod sections;
 pub type Result<T> = std::result::Result<T, error::Error>;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct FileExtendedInformation {
+pub struct FileExInfo {
     /// Entry point (ELF & PE)
     pub entry_point: Option<EntryPoint>,
     /// Signatures (PE only)
@@ -70,7 +70,7 @@ impl From<ElfFileInformation> for FileExInfo {
     }
 }
 
-pub fn get_file_information(file_path: &str) -> Result<FileExtendedInformation> {
+pub fn get_file_information(file_path: &str) -> Result<FileExInfo> {
     let payload = std::fs::read(file_path)?;
     match goblin::Object::parse(&payload)? {
         goblin::Object::PE(_) => {
