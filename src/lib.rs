@@ -37,7 +37,7 @@ pub struct FileExInfo {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub enum FileInformation {
+enum FileInformation {
     Pe(PeFileInformation),
     Elf(ElfFileInformation),
 }
