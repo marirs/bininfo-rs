@@ -19,3 +19,15 @@ cms = { version = "0.2.0", default-features = false }
 
 [features]
 serde = ["serde/derive"]
+
+
+[profile.dev]
+opt-level = 3
+debug-assertions = false
+
+[profile.release]
+codegen-units = 1
+debug-assertions = false
+debug = false
+opt-level = 3
+lto = true
