@@ -1,6 +1,8 @@
 [package]
 name = "file_info"
-version = "0.1.0"
+authors = ["SG <marirs@gmail.com>"]
+description = "Provides file information for PE and ELF files"
+version = "0.1.3"
 edition = "2021"
 
 [dependencies]
