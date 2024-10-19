@@ -1,7 +1,9 @@
 use crate::error::Error;
+use crate::{compare_default_impl, pe::util::Comparable};
 use exe::VecPE;
 use phf::phf_map;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::{fmt, iter, mem};
 
 /// From https://github.com/RichHeaderResearch/RichPE/blob/master/spoof_check.py
@@ -311,6 +313,7 @@ impl RichRecord {
             .unwrap_or("")
     }
 }
+
 /// Rich structure.
 #[derive(Copy, Clone)]
 pub struct RichStructure<'a> {
@@ -496,6 +499,8 @@ impl RichTable {
         rich_table
     }
 }
+
+compare_default_impl!(RichTable, RichRecord);
 
 impl IntoIterator for RichTable {
     type Item = RichRecord;

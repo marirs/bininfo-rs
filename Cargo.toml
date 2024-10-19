@@ -1,8 +1,6 @@
 [package]
 name = "file_info"
-authors = ["SG <marirs@gmail.com>"]
-description = "Provides file information for PE and ELF files"
-version = "0.1.2"
+version = "0.1.0"
 edition = "2021"
 
 [dependencies]
@@ -13,22 +11,9 @@ hex = "0.4.3"
 serde = { version = "1.0.210", features = ["derive"] }
 entropy = "0.4.2"
 phf = { version="0.11.2" , features = ["macros"] }
+pkbuffer = "0.4.1"
 bytemuck = "1.19.0"
 cms = { version = "0.2.0", default-features = false }
 
 [features]
 serde = ["serde/derive"]
-
-[[example]]
-name = "fileinfo-cli"
-path = "examples/cli.rs"
-
-[profile.dev]
-opt-level = 3
-
-[profile.release]
-codegen-units = 1
-debug-assertions = false
-debug = false
-opt-level = 3
-lto = true

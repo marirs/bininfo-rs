@@ -10,7 +10,7 @@ pub struct Section {
     pub virt_size: u64,
     pub raw_addr: u64,
     pub raw_size: u64,
-    #[serde(skip_serializing)]
+    #[serde(skip)]
     pub data: Vec<u8>,
     pub entropy: Option<f32>,
     pub characteristics: Option<String>,
