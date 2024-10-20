@@ -80,8 +80,8 @@ impl From<ElfFileInformation> for FileExInfo {
     }
 }
 
-pub fn get_file_extended_information(file_path: &str) -> Result<FileExInfo> {
-    if !Path::new(file_path).is_file() {
+pub fn get_file_extended_information<P: AsRef<Path>>(file_path: P) -> Result<FileExInfo> {
+    if !file_path.as_ref().is_file() {
         return Err(Error::FileNotFound);
     }
     let payload = read(file_path)?;
