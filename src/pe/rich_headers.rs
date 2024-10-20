@@ -300,7 +300,7 @@ impl RichRecord {
     }
 
     pub fn lookup_vs_version(&self) -> &'static str {
-        match COMP_ID_MAP.get(&(((self.product as u32) << 16) & self.build as u32)) {
+        match COMP_ID_MAP.get(&(((self.product as u32) << 16) | self.build as u32)) {
             Some(dd) => dd,
             _ => "UNKNOWN PRODUCT",
         }
