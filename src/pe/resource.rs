@@ -27,7 +27,6 @@ pub struct Resources {
 impl Resources {
     pub fn parse<P: PE>(pe: &P) -> Result<Option<Resources>, exe::Error> {
         if !pe.has_data_directory(ImageDirectoryEntry::Resource) {
-            println!("No resource dirctory");
             return Ok(None);
         }
         let rsrc = ResourceDirectory::parse(pe)?;
@@ -66,11 +65,6 @@ impl Resources {
                 resource_entry.data_start = Some(offset);
                 resource_entry.data_end = Some(offset + data_entry.size as usize);
             };
-
-            // println!(
-            // "Resource timestamp: {}",
-            // format_timestamp(root_node.directory.time_date_stamp as i64)
-            // );
 
             result.resources.push(resource_entry);
         }
