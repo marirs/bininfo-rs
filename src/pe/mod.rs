@@ -8,7 +8,7 @@ use crate::{
     Result,
 };
 use exe::VecPE;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 pub mod hash;
 pub mod imports;
@@ -18,7 +18,7 @@ pub mod signatures;
 pub mod tls;
 pub(crate) mod util;
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct PeFileInformation {
     pub entry_point: EntryPoint,
     pub hashes: Hashes,

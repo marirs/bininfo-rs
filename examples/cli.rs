@@ -7,6 +7,6 @@ fn main() -> Result<()> {
         return Ok(());
     }
     let res = file_info::get_file_extended_information(&argv[1])?;
-    eprintln!("{:?}", res);
+    println!("{:#?}", &res);
     Ok(())
 }

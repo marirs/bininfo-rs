@@ -6,6 +6,12 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::{fmt, iter, mem};
 
+include!(concat!(env!("OUT_DIR"), "/comp_id.rs"));
+
+lazy_static::lazy_static! {
+    static ref COMP_ID_MAP: HashMap<u32, &'static str> = comp_ids();
+}
+
 /// From https://github.com/RichHeaderResearch/RichPE/blob/master/spoof_check.py
 /// (Thanks !)
 static KNOWN_PRODUCT_IDS: phf::Map<u16, &'static str> = phf_map! {
@@ -257,12 +263,16 @@ static KNOWN_PRODUCT_IDS: phf::Map<u16, &'static str> = phf_map! {
 const DANS_MARKER: u32 = 0x536e6144; // "DanS"
 const RICH_MARKER: u32 = 0x68636952; // "Rich"
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Default, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Default, Hash, Serialize, Deserialize)]
 #[repr(C)]
 pub struct RichRecord {
+    #[serde(rename = "product_name")]
+    pub name: String,
     pub build: u16,
     pub product: u16,
     pub count: u32,
+    #[serde(rename = "guessed_visual_studio_version")]
+    pub vs: String,
 }
 
 impl RichRecord {
@@ -272,11 +282,16 @@ impl RichRecord {
         let build = (field & 0xffff) as u16;
         let product = ((field >> 16) & 0xffff) as u16;
         let count = values[1] ^ key;
-        RichRecord {
+        let mut rr = RichRecord {
+            name: "".to_string(),
             build,
             product,
             count,
-        }
+            vs: "".to_string(),
+        };
+        rr.name = rr.get_product_name().to_string();
+        rr.vs = rr.lookup_vs_version().to_string();
+        rr
     }
     /// Encodes the record with the given key.
     pub fn encode(&self, key: u32) -> [u32; 2] {
@@ -284,25 +299,10 @@ impl RichRecord {
         [value ^ key, self.count ^ key]
     }
 
-    /// From https://github.com/hasherezade/bearparser/blob/65d6417b1283eb64237141ee0c865bdf0f13ac73/parser/pe/RichHdrWrapper.cpp#L231
-    /// (Thanks !)
     pub fn lookup_vs_version(&self) -> &'static str {
-        match &self.product {
-            1 => "Visual Studio",
-            0x2 | 0x6 | 0xC | 0xE => "Visual Studio 97 05.00",
-            0xA | 0xB | 0xD | 0x15 | 0x16 => "Visual Studio 6.0 06.00",
-            0x0019..=0x0045 => "Visual Studio 2002 07.00",
-            0x005a..=0x006c => "Visual Studio 2003 07.10",
-            0x006d..=0x0082 => "Visual Studio 2005 08.00",
-            0x0106..=0x010a => "Visual Studio 2017 14.01+",
-            0x00fd..=0x0105 => "Visual Studio 2015 14.00",
-            0x00eb..=0x00fc => "Visual Studio 2013 12.10",
-            0x00d9..=0x00ea => "Visual Studio 2013 12.00",
-            0x00c7..=0x00d8 => "Visual Studio 2012 11.00",
-            0x00b5..=0x00c6 => "Visual Studio 2010 10.10",
-            0x0098..=0x00b4 => "Visual Studio 2010 10.00",
-            0x0083..=0x0097 => "Visual Studio 2008 09.00",
-            _ => "UNKN PRODUCT",
+        match COMP_ID_MAP.get(&(((self.product as u32) << 16) & self.build as u32)) {
+            Some(dd) => dd,
+            _ => "UNKNOWN PRODUCT",
         }
     }
 
@@ -467,7 +467,7 @@ impl<'a> fmt::Debug for RichStructure<'a> {
     }
 }
 
-#[derive(PartialEq, Eq, Debug, Default, Hash, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Debug, Default, Hash, Clone, Deserialize, Serialize)]
 pub struct RichTable {
     pub rich_entries: Vec<RichRecord>,
     pub key: u32,

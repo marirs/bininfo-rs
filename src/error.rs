@@ -8,6 +8,8 @@ pub enum Error {
     ExeError(exe::Error),
     AuthenticodeError(authenticode::AttributeCertificateError),
 
+    /// File does not exist
+    FileNotFound,
     /// Null address.
     Null,
     /// Out of bounds.

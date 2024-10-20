@@ -1,8 +1,6 @@
 [package]
 name = "file_info"
-authors = ["SG <marirs@gmail.com>"]
-description = "Provides file information for PE and ELF files"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 
 [dependencies]
@@ -16,10 +14,17 @@ phf = { version="0.11.2" , features = ["macros"] }
 pkbuffer = "0.4.1"
 bytemuck = "1.19.0"
 cms = { version = "0.2.0", default-features = false }
+lazy_static = "1.5"
+
+[build-dependencies]
+nom = "7"
 
 [features]
 serde = ["serde/derive"]
 
+[[example]]
+name = "fileinfo"
+path = "examples/cli.rs"
 
 [profile.dev]
 opt-level = 3
