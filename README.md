@@ -1,6 +1,6 @@
 # File Information
 
-Provides some file information for PE and ELF.
+Provides some information on PE and ELF files.
 
 ### Requirements
 - Rust 1.60+
