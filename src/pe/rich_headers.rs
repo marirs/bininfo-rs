@@ -272,7 +272,7 @@ pub struct RichRecord {
     pub product: u16,
     pub count: u32,
     #[serde(rename = "guessed_visual_studio_version")]
-    pub vs: String,
+    pub guessed_vs_ver: String,
 }
 
 impl RichRecord {
@@ -287,10 +287,10 @@ impl RichRecord {
             build,
             product,
             count,
-            vs: "".to_string(),
+            guessed_vs_ver: "".to_string(),
         };
         rr.name = rr.get_product_name().to_string();
-        rr.vs = rr.lookup_vs_version().to_string();
+        rr.guessed_vs_ver = rr.lookup_vs_version().to_string();
         rr
     }
     /// Encodes the record with the given key.
