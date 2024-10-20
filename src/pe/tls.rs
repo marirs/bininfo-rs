@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct TlsCallbacks {
-    callbacks: Vec<u64>,
+    pub callbacks: Vec<u64>,
 }
 
 impl TlsCallbacks {
