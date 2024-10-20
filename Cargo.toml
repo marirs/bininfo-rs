@@ -1,5 +1,7 @@
 [package]
 name = "file_info"
+authors = ["SG", "Andrey Mnatsakanov", "Clement Karimi"]
+description = "Provides file information for PE and ELF files"
 version = "0.1.4"
 edition = "2021"
 
