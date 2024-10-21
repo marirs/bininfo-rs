@@ -85,12 +85,13 @@ pub fn get_file_extended_information<P: AsRef<Path>>(file_path: P) -> Result<Fil
         return Err(Error::FileNotFound);
     }
     let payload = read(file_path)?;
-    match goblin::Object::parse(&payload)? {
-        goblin::Object::PE(_) => {
-            let image = VecPE::from_disk_data(&payload);
-            Ok(PeFileInformation::parse(&image)?.into())
+    let image = VecPE::from_disk_data(&payload);
+    if let Ok(pe) = PeFileInformation::parse(&image) {
+        Ok(pe.into())
+    } else {
+        match goblin::Object::parse(&payload)? {
+            goblin::Object::Elf(elf) => Ok(ElfFileInformation::parse(&elf)?.into()),
+            _ => Err(Error::UnsupportedFileType),
         }
-        goblin::Object::Elf(elf) => Ok(ElfFileInformation::parse(&elf)?.into()),
-        _ => Err(Error::UnsupportedFileType),
     }
 }

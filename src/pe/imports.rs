@@ -27,7 +27,6 @@ impl Imports {
                 return Err(exe::Error::BadDirectory(ImageDirectoryEntry::Import));
             }
         };
-
         for import in import_directory.descriptors {
             let mut entry = ImportEntry::default();
 
@@ -47,7 +46,7 @@ impl Imports {
             };
             for import_data in import_entries {
                 let function_name = match import_data {
-                    ImportData::Ordinal(x) => x.to_string(),
+                    ImportData::Ordinal(x) => format!("Ordinal({x})"),
                     ImportData::ImportByName(s) => s.to_string(),
                 };
                 let is_import_by_ordinal = matches!(import_data, ImportData::Ordinal(_));
@@ -56,10 +55,8 @@ impl Imports {
                     import_by_ordinal: is_import_by_ordinal,
                 });
             }
-
             result.modules.push(entry);
         }
-
         Ok(result)
     }
 }
