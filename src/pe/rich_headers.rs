@@ -1,15 +1,13 @@
-use crate::error::Error;
-use crate::{compare_default_impl, pe::util::Comparable};
+use crate::{compare_default_impl, error::Error, pe::util::Comparable};
 use exe::VecPE;
 use phf::phf_map;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::{fmt, iter, mem};
+use std::{collections::HashMap, fmt, iter, mem};
 
-include!(concat!(env!("OUT_DIR"), "/comp_id.rs"));
+const COMPS: &str = include_str!("../../assets/comp_id.txt");
 
 lazy_static::lazy_static! {
-    static ref COMP_ID_MAP: HashMap<u32, &'static str> = comp_ids();
+    static ref COMP_ID_MAP: HashMap<u32, &'static str> = get_compid_map();
 }
 
 /// From https://github.com/RichHeaderResearch/RichPE/blob/master/spoof_check.py
@@ -611,4 +609,28 @@ impl<'a> fmt::Debug for RichIter<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_list().entries(self.clone()).finish()
     }
+}
+
+/// Create the comp id map
+fn get_compid_map() -> HashMap<u32, &'static str> {
+    COMPS
+        .trim()
+        .lines()
+        .filter(|line| !line.is_empty())
+        .filter(|line| !line.starts_with('#') && !line.starts_with("00000000"))
+        .map(|line| line.split_once('#').map_or(line, |(s, _)| s.trim()))
+        .filter_map(|line| {
+            let comp_id = line
+                .split_once('[')
+                .map_or(line.trim(), |(first, _)| first.trim());
+            let desc = line
+                .split_once(']')
+                .map_or(line.trim(), |(_, second)| second.trim());
+            u32::from_str_radix(comp_id, 16).map(|v| (v, desc)).ok()
+        })
+        // Collect into a Vec first to remove duplicates
+        .collect::<Vec<(u32, &str)>>()
+        .into_iter()
+        // Then collect into a HashMap which will skip duplicates
+        .collect()
 }
