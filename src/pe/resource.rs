@@ -6,10 +6,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, PartialOrd, Ord, Eq)]
 pub struct ResourceEntry {
-    pub rsrc_type: String,
-    pub type_id: Option<u32>,
-    pub rsrc_id: String,
-    pub lang_id: String,
+    pub resource_type: String,
+    pub offset: Option<u32>,
+    pub resource_id: String,
+    pub language_id: String,
     pub data_start: Option<usize>,
     pub data_end: Option<usize>,
 }
@@ -41,17 +41,17 @@ impl Resources {
         };
         for entry in rsrc.resources {
             let mut resource_entry = ResourceEntry::default();
-            resource_entry.rsrc_type = match &entry.type_id {
+            resource_entry.resource_type = match &entry.type_id {
                 ResolvedDirectoryID::ID(id) => {
-                    resource_entry.type_id = Some(*id);
+                    resource_entry.offset = Some(*id);
                     resource_id_to_type(ResourceID::from_u32(*id))
                 }
                 ResolvedDirectoryID::Name(name) => name.to_owned(),
             };
             resource_entry.data_end = None;
             resource_entry.data_start = None;
-            resource_entry.rsrc_id = format!("{:?}", entry.rsrc_id).to_string();
-            resource_entry.lang_id = format!("{:?}", entry.lang_id).to_string();
+            resource_entry.resource_id = format!("{:?}", entry.rsrc_id).to_string();
+            resource_entry.language_id = format!("{:?}", entry.lang_id).to_string();
 
             let data_entry = entry.get_data_entry(pe).unwrap_or(&ImageResourceDataEntry {
                 offset_to_data: RVA(0),

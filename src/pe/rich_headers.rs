@@ -266,13 +266,11 @@ const RICH_MARKER: u32 = 0x68636952; // "Rich"
 #[derive(Clone, Debug, Eq, PartialEq, Default, Hash, Serialize, Deserialize)]
 #[repr(C)]
 pub struct RichRecord {
-    #[serde(rename = "product_name")]
-    pub name: String,
+    pub product_name: String,
     pub build: u16,
-    pub product: u16,
+    pub product_id: u16,
     pub count: u32,
-    #[serde(rename = "guessed_visual_studio_version")]
-    pub guessed_vs_ver: String,
+    pub guessed_visual_studio_version: String,
 }
 
 impl RichRecord {
@@ -283,24 +281,24 @@ impl RichRecord {
         let product = ((field >> 16) & 0xffff) as u16;
         let count = values[1] ^ key;
         let mut rr = RichRecord {
-            name: "".to_string(),
+            product_name: "".to_string(),
             build,
-            product,
+            product_id: product,
             count,
-            guessed_vs_ver: "".to_string(),
+            guessed_visual_studio_version: "".to_string(),
         };
-        rr.name = rr.get_product_name().to_string();
-        rr.guessed_vs_ver = rr.lookup_vs_version().to_string();
+        rr.product_name = rr.get_product_name().to_string();
+        rr.guessed_visual_studio_version = rr.lookup_vs_version().to_string();
         rr
     }
     /// Encodes the record with the given key.
     pub fn encode(&self, key: u32) -> [u32; 2] {
-        let value = (self.product as u32) << 16 | (self.build as u32);
+        let value = (self.product_id as u32) << 16 | (self.build as u32);
         [value ^ key, self.count ^ key]
     }
 
     pub fn lookup_vs_version(&self) -> &'static str {
-        match COMP_ID_MAP.get(&(((self.product as u32) << 16) | self.build as u32)) {
+        match COMP_ID_MAP.get(&(((self.product_id as u32) << 16) | self.build as u32)) {
             Some(dd) => dd,
             _ => "UNKNOWN PRODUCT",
         }
@@ -308,8 +306,8 @@ impl RichRecord {
 
     pub fn get_product_name(&self) -> &'static str {
         KNOWN_PRODUCT_IDS
-            .contains_key(&self.product)
-            .then(|| KNOWN_PRODUCT_IDS[&self.product])
+            .contains_key(&self.product_id)
+            .then(|| KNOWN_PRODUCT_IDS[&self.product_id])
             .unwrap_or("")
     }
 }
@@ -404,7 +402,7 @@ impl<'a> RichStructure<'a> {
         }
 
         for record in records {
-            let value = (record.product as u32) << 16 | (record.build as u32);
+            let value = (record.product_id as u32) << 16 | (record.build as u32);
             csum = u32::wrapping_add(csum, value.rotate_left(record.count));
         }
 

@@ -158,11 +158,11 @@ fn main() -> Result<()> {
         if !rich_table.rich_entries.is_empty() {
             for v in rich_table.rich_entries.iter() {
                 tbl.add_row(Row::new(vec![
-                    Cell::new(&v.name),
+                    Cell::new(&v.product_name),
                     Cell::new(&v.build.to_string()),
-                    Cell::new(&v.product.to_string()),
+                    Cell::new(&v.product_id.to_string()),
                     Cell::new(&v.count.to_string()),
-                    Cell::new(&v.guessed_vs_ver),
+                    Cell::new(&v.guessed_visual_studio_version),
                 ]));
             }
         } else {
@@ -344,10 +344,10 @@ fn main() -> Result<()> {
                     format!("{:#01x}", v.data_end.unwrap())
                 };
                 tbl.add_row(Row::new(vec![
-                    Cell::new(&v.rsrc_type),
-                    Cell::new(&v.type_id.unwrap_or(0).to_string()),
-                    Cell::new(&v.rsrc_id),
-                    Cell::new(&v.lang_id),
+                    Cell::new(&v.resource_type),
+                    Cell::new(&v.offset.unwrap_or(0).to_string()),
+                    Cell::new(&v.resource_id),
+                    Cell::new(&v.language_id),
                     Cell::new(&data_start),
                     Cell::new(&data_end),
                 ]));

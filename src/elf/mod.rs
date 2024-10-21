@@ -38,7 +38,7 @@ impl TryFrom<&elf::Elf<'_>> for Imports {
                 if sym.is_import() && sym.is_function() {
                     if let Some(ee) = elf.strtab.get_at(sym.st_name) {
                         if let Some((func, module)) = ee.split_once("@@") {
-                            let e = acc.entry(module.to_string()).or_insert(vec![]);
+                            let e = acc.entry(module.to_string()).or_default();
                             e.push(func.to_string())
                         }
                     }
