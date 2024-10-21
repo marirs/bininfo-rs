@@ -2,7 +2,7 @@
 [![macOS](https://github.com/marirs/fileinfo-rs/actions/workflows/macos.yml/badge.svg)](https://github.com/marirs/fileinfo-rs/actions/workflows/macos.yml)
 [![Linux x86_64](https://github.com/marirs/fileinfo-rs/actions/workflows/linux_x86-64.yml/badge.svg)](https://github.com/marirs/fileinfo-rs/actions/workflows/linux_x86-64.yml)
 [![Linux Arm7](https://github.com/marirs/fileinfo-rs/actions/workflows/linux_arm7.yml/badge.svg)](https://github.com/marirs/fileinfo-rs/actions/workflows/linux_arm7.yml)
-[![Windows](https://github.com/marirs/fileinfo-rs/actions/workflows/windows.yml/badge.svg)](https://github.com/marirs/fileinfo-rs/actions/workflows/windows.yml)
+[![Windows](https://github.com/marirs/fileinfo-rs/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/marirs/fileinfo-rs/actions/workflows/windows.yml)
 
 Provides some information on PE and ELF files.
 
