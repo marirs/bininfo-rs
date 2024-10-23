@@ -1,4 +1,4 @@
-use file_info::Result;
+use bininfo::Result;
 use prettytable::{color, format::Alignment, Attr, Cell, Row, Table};
 
 fn main() -> Result<()> {
@@ -7,7 +7,7 @@ fn main() -> Result<()> {
         eprintln!("Usage:\n\t{} <file>", argv[0]);
         return Ok(());
     }
-    let res = file_info::get_file_extended_information(&argv[1])?;
+    let res = bininfo::get_file_extended_information(&argv[1])?;
 
     // ================= Entry point table =================
     let mut tbl = Table::new();

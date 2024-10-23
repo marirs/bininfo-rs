@@ -1,7 +1,7 @@
-use crate::error::Error;
 use crate::{
     elf::ElfFileInformation,
     entry_point::EntryPoint,
+    error::Error,
     pe::{
         imports::Imports, resource::Resources, rich_headers::RichTable,
         signatures::PeAuthenticodes, tls::TlsCallbacks, PeFileInformation,
