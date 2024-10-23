@@ -1,8 +1,8 @@
 [package]
-name = "file_info"
+name = "bininfo"
 authors = ["SG", "Andrey Mnatsakanov", "Clement Karimi"]
 description = "Provides file information for PE and ELF files"
-version = "0.3.2"
+version = "0.4.1"
 include = [
     "assets",
     "src"
@@ -29,7 +29,7 @@ prettytable-rs = "0.10.0"
 serde = ["serde/derive"]
 
 [[example]]
-name = "fileinfo"
+name = "bininfo"
 path = "examples/cli.rs"
 
 [profile.dev]
