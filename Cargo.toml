@@ -7,6 +7,9 @@ include = [
     "assets",
     "src"
 ]
+categories = ["filesystem"]
+keywords = ["binary", "extended", "information"]
+license-file = "LICENSE"
 edition = "2021"
 
 [dependencies]
