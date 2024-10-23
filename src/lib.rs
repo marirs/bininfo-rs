@@ -18,11 +18,11 @@ pub mod error;
 pub mod pe;
 pub mod sections;
 
-pub type Result<T> = std::result::Result<T, error::Error>;
+pub type Result<T> = std::result::Result<T, Error>;
 
-/// Extended Information for a given file
+/// Extended Information for a given binary
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
-pub struct FileExInfo {
+pub struct BinExInfo {
     /// Entry point (ELF & PE)
     #[serde(default)]
     pub entry_point: Option<EntryPoint>,
@@ -46,15 +46,9 @@ pub struct FileExInfo {
     pub tls_callbacks: Option<TlsCallbacks>,
 }
 
-//#[derive(Clone, Debug, Serialize)]
-//enum FileInformation {
-//    Pe(PeFileInformation),
-//    Elf(ElfFileInformation),
-//}
-
-impl From<PeFileInformation> for FileExInfo {
+impl From<PeFileInformation> for BinExInfo {
     fn from(val: PeFileInformation) -> Self {
-        FileExInfo {
+        BinExInfo {
             entry_point: Some(val.entry_point),
             signature: Some(val.signature),
             rich_headers: Some(val.rich_headers),
@@ -66,9 +60,9 @@ impl From<PeFileInformation> for FileExInfo {
     }
 }
 
-impl From<ElfFileInformation> for FileExInfo {
+impl From<ElfFileInformation> for BinExInfo {
     fn from(val: ElfFileInformation) -> Self {
-        FileExInfo {
+        BinExInfo {
             entry_point: Some(val.entry_point),
             signature: None,
             rich_headers: None,
@@ -80,7 +74,16 @@ impl From<ElfFileInformation> for FileExInfo {
     }
 }
 
-pub fn get_file_extended_information<P: AsRef<Path>>(file_path: P) -> Result<FileExInfo> {
+/// Get the Extended Information for given Binary
+///
+/// ```ignore
+/// use bininfo::get_file_extended_information;
+///
+/// let bin_info = get_file_extended_information("/path/to/file");
+///
+/// println!("{:?}", bin_info)
+/// ```
+pub fn get_file_extended_information<P: AsRef<Path>>(file_path: P) -> Result<BinExInfo> {
     if !file_path.as_ref().is_file() {
         return Err(Error::FileNotFound);
     }
