@@ -11,7 +11,7 @@ Provides some information on PE and ELF files.
 
 ### Example
 ```text
-$ ./fileinfo ~/Downloads/test.exe 
+$ ./bininfo ~/Downloads/test.exe 
 
 +-----------------+----------------------------------------------+
 |                          Entry point                           |
