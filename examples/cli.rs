@@ -80,13 +80,7 @@ fn main() -> Result<()> {
             ]));
         }
     } else {
-        tbl.add_row(Row::new(vec![Cell::new_align(
-            "NO DATA",
-            Alignment::CENTER,
-        )
-        .with_hspan(2)
-        .with_style(Attr::Bold)
-        .with_style(Attr::ForegroundColor(color::BLUE))]));
+        no_data_available(&mut tbl);
     }
     // Print the Entrypoint table
     tbl.printstd();
@@ -123,22 +117,10 @@ fn main() -> Result<()> {
                 ]));
             }
         } else {
-            tbl.add_row(Row::new(vec![Cell::new_align(
-                "NO DATA",
-                Alignment::CENTER,
-            )
-            .with_hspan(7)
-            .with_style(Attr::Bold)
-            .with_style(Attr::ForegroundColor(color::BLUE))]));
+            no_data_available(&mut tbl);
         }
     } else {
-        tbl.add_row(Row::new(vec![Cell::new_align(
-            "NO DATA",
-            Alignment::CENTER,
-        )
-        .with_hspan(7)
-        .with_style(Attr::Bold)
-        .with_style(Attr::ForegroundColor(color::BLUE))]));
+        no_data_available(&mut tbl);
     }
     // Print the Sections table
     tbl.printstd();
@@ -171,22 +153,10 @@ fn main() -> Result<()> {
                 ]));
             }
         } else {
-            tbl.add_row(Row::new(vec![Cell::new_align(
-                "NO DATA",
-                Alignment::CENTER,
-            )
-            .with_hspan(5)
-            .with_style(Attr::Bold)
-            .with_style(Attr::ForegroundColor(color::BLUE))]));
+            no_data_available(&mut tbl);
         }
     } else {
-        tbl.add_row(Row::new(vec![Cell::new_align(
-            "NO DATA",
-            Alignment::CENTER,
-        )
-        .with_hspan(5)
-        .with_style(Attr::Bold)
-        .with_style(Attr::ForegroundColor(color::BLUE))]));
+        no_data_available(&mut tbl);
     }
     // Print the Rich Headers table
     tbl.printstd();
@@ -249,22 +219,10 @@ fn main() -> Result<()> {
                 }
             }
         } else {
-            tbl.add_row(Row::new(vec![Cell::new_align(
-                "NO DATA",
-                Alignment::CENTER,
-            )
-            .with_hspan(2)
-            .with_style(Attr::Bold)
-            .with_style(Attr::ForegroundColor(color::BLUE))]));
+            no_data_available(&mut tbl);
         }
     } else {
-        tbl.add_row(Row::new(vec![Cell::new_align(
-            "NO DATA",
-            Alignment::CENTER,
-        )
-        .with_hspan(2)
-        .with_style(Attr::Bold)
-        .with_style(Attr::ForegroundColor(color::BLUE))]));
+        no_data_available(&mut tbl);
     }
     // Print the Signatures table
     tbl.printstd();
@@ -297,22 +255,10 @@ fn main() -> Result<()> {
                 ]));
             }
         } else {
-            tbl.add_row(Row::new(vec![Cell::new_align(
-                "NO DATA",
-                Alignment::CENTER,
-            )
-            .with_hspan(2)
-            .with_style(Attr::Bold)
-            .with_style(Attr::ForegroundColor(color::BLUE))]));
+            no_data_available(&mut tbl);
         }
     } else {
-        tbl.add_row(Row::new(vec![Cell::new_align(
-            "NO DATA",
-            Alignment::CENTER,
-        )
-        .with_hspan(2)
-        .with_style(Attr::Bold)
-        .with_style(Attr::ForegroundColor(color::BLUE))]));
+        no_data_available(&mut tbl);
     }
 
     // Print the Imports table
@@ -358,22 +304,10 @@ fn main() -> Result<()> {
                 ]));
             }
         } else {
-            tbl.add_row(Row::new(vec![Cell::new_align(
-                "NO DATA",
-                Alignment::CENTER,
-            )
-            .with_hspan(6)
-            .with_style(Attr::Bold)
-            .with_style(Attr::ForegroundColor(color::BLUE))]));
+            no_data_available(&mut tbl);
         }
     } else {
-        tbl.add_row(Row::new(vec![Cell::new_align(
-            "NO DATA",
-            Alignment::CENTER,
-        )
-        .with_hspan(6)
-        .with_style(Attr::Bold)
-        .with_style(Attr::ForegroundColor(color::BLUE))]));
+        no_data_available(&mut tbl);
     }
 
     // Print the Resources table
@@ -397,26 +331,24 @@ fn main() -> Result<()> {
                 ]));
             }
         } else {
-            tbl.add_row(Row::new(vec![Cell::new_align(
-                "NO DATA",
-                Alignment::CENTER,
-            )
-            .with_hspan(2)
-            .with_style(Attr::Bold)
-            .with_style(Attr::ForegroundColor(color::BLUE))]));
+            no_data_available(&mut tbl);
         }
     } else {
-        tbl.add_row(Row::new(vec![Cell::new_align(
-            "NO DATA",
-            Alignment::CENTER,
-        )
-        .with_hspan(2)
-        .with_style(Attr::Bold)
-        .with_style(Attr::ForegroundColor(color::BLUE))]));
+        no_data_available(&mut tbl);
     }
 
     // Print the Thread Local Storage (TLS) Callback table
     tbl.printstd();
 
     Ok(())
+}
+
+fn no_data_available(tbl: &mut Table) {
+    tbl.add_row(Row::new(vec![Cell::new_align(
+        "NO DATA",
+        Alignment::CENTER,
+    )
+        .with_hspan(2)
+        .with_style(Attr::Bold)
+        .with_style(Attr::ForegroundColor(color::BLUE))]));
 }
