@@ -9,6 +9,11 @@ fn main() -> Result<()> {
     }
     let res = bininfo::get_file_extended_information(&argv[1])?;
 
+    if argv.len() > 3 && argv[2] == "--json" {
+        println!("{}", serde_json::to_string_pretty(&res)?);
+        return Ok(());
+    }
+
     // ================= Entry point table =================
     let mut tbl = Table::new();
     tbl.set_titles(Row::new(vec![Cell::new_align(

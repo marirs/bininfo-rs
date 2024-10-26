@@ -7,6 +7,7 @@ pub enum Error {
     GoblinError(goblin::error::Error),
     ExeError(exe::Error),
     AuthenticodeError(authenticode::AttributeCertificateError),
+    SerdeError(serde_json::Error),
 
     /// File does not exist
     FileNotFound,
@@ -84,6 +85,12 @@ impl From<exe::Error> for Error {
 impl From<authenticode::AttributeCertificateError> for Error {
     fn from(e: authenticode::AttributeCertificateError) -> Self {
         Error::AuthenticodeError(e)
+    }
+}
+
+impl From<serde_json::Error> for Error {
+    fn from(e: serde_json::Error) -> Self {
+        Error::SerdeError(e)
     }
 }
 
