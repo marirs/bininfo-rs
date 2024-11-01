@@ -1,5 +1,5 @@
 use crate::{compare_default_impl, error::Error, pe::util::Comparable};
-use exe::VecPE;
+use goblin::pe::PE;
 use phf::phf_map;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt, iter, mem};
@@ -470,16 +470,15 @@ pub struct RichTable {
 }
 
 impl RichTable {
-    pub fn parse(pe: &VecPE) -> RichTable {
+    pub fn parse(pe: (&PE, &[u8])) -> RichTable {
         let mut rich_table: RichTable = RichTable {
             rich_entries: vec![],
             key: 0,
         };
-        let ptr_buf = pe.get_buffer().as_ref();
-        if ptr_buf.len() < 0x400 {
+        if pe.1.len() < 0x400 {
             return rich_table;
         }
-        let rich_header = match RichStructure::try_from(bytemuck::cast_slice(&ptr_buf[0..0x400])) {
+        let rich_header = match RichStructure::try_from(bytemuck::cast_slice(&pe.1[0..0x400])) {
             Ok(rich) => rich,
             Err(_) => {
                 return rich_table;

@@ -1,3 +1,5 @@
+use authenticode::AttributeCertificateAuthenticodeError;
+
 #[derive(Debug)]
 pub enum Error {
     InvalidIdentifier,
@@ -6,6 +8,7 @@ pub enum Error {
     IoError(std::io::Error),
     GoblinError(goblin::error::Error),
     ExeError(exe::Error),
+    AttributeCertificateAuthenticodeError(AttributeCertificateAuthenticodeError),
     AuthenticodeError(authenticode::AttributeCertificateError),
 
     /// File does not exist
@@ -78,6 +81,12 @@ impl From<goblin::error::Error> for Error {
 impl From<exe::Error> for Error {
     fn from(e: exe::Error) -> Self {
         Error::ExeError(e)
+    }
+}
+
+impl From<authenticode::AttributeCertificateAuthenticodeError> for Error {
+    fn from(e: authenticode::AttributeCertificateAuthenticodeError) -> Self {
+        Error::AttributeCertificateAuthenticodeError(e)
     }
 }
 

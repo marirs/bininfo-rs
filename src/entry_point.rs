@@ -1,5 +1,5 @@
 use crate::sections::{Section, SectionTable};
-use exe::{VecPE, PE};
+use goblin::pe::PE;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, PartialEq, PartialOrd, Serialize, Deserialize)]
@@ -7,11 +7,11 @@ pub struct EntryPoint {
     pub address: u64,
     pub section: Option<Section>,
 }
-impl TryFrom<&VecPE> for EntryPoint {
+impl TryFrom<(&goblin::pe::PE<'_>, &[u8])> for EntryPoint {
     type Error = crate::error::Error;
 
-    fn try_from(pe: &VecPE) -> Result<Self, Self::Error> {
-        let entry_point = pe.get_entrypoint()?.0 as u64;
+    fn try_from(pe: (&PE, &[u8])) -> Result<Self, Self::Error> {
+        let entry_point = pe.0.entry as u64;
         let sections = SectionTable::try_from(pe)?;
         let entry_section = sections.sections.into_iter().find(|section| {
             entry_point >= (section.virt_addr)

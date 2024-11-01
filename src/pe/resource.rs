@@ -1,8 +1,9 @@
-use exe::{
-    ImageDirectoryEntry, ImageResourceDataEntry, PETranslation, ResolvedDirectoryID,
-    ResourceDirectory, ResourceID, PE, RVA,
-};
+use exe::{PETranslation, ResolvedDirectoryID, ResourceDirectory, ResourceID};
+use exe::PE as PETrait;
+use goblin::pe::PE;
 use serde::{Deserialize, Serialize};
+
+use super::PeFileInformation;
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, PartialOrd, Ord, Eq)]
 pub struct ResourceEntry {
@@ -25,12 +26,9 @@ pub struct Resources {
 }
 
 impl Resources {
-    pub fn parse<P: PE>(pe: &P) -> Result<Option<Resources>, exe::Error> {
-        if !pe.has_data_directory(ImageDirectoryEntry::Resource) {
-            return Ok(None);
-        }
-        let rsrc = ResourceDirectory::parse(pe)?;
-
+    pub fn parse(pe: (&PE, &[u8])) -> Result<Option<Resources>, crate::Error> {
+        let image = exe::VecPE::from_disk_data(pe.1);
+        let rsrc = ResourceDirectory::parse(&image)?;
         let mut result: Resources = Resources {
             minor_version: rsrc.root_node.directory.minor_version,
             major_version: rsrc.root_node.directory.major_version,
@@ -53,14 +51,16 @@ impl Resources {
             resource_entry.resource_id = format!("{:?}", entry.rsrc_id).to_string();
             resource_entry.language_id = format!("{:?}", entry.lang_id).to_string();
 
-            let data_entry = entry.get_data_entry(pe).unwrap_or(&ImageResourceDataEntry {
-                offset_to_data: RVA(0),
-                size: 0,
-                code_page: 0,
-                reserved: 0,
-            });
+            let data_entry = entry
+                .get_data_entry(&image)
+                .unwrap_or(&exe::ImageResourceDataEntry {
+                    offset_to_data: exe::RVA(0),
+                    size: 0,
+                    code_page: 0,
+                    reserved: 0,
+                });
 
-            let offset = pe.translate(PETranslation::Memory(data_entry.offset_to_data));
+            let offset = image.translate(PETranslation::Memory(data_entry.offset_to_data));
             if let Ok(offset) = offset {
                 resource_entry.data_start = Some(offset);
                 resource_entry.data_end = Some(offset + data_entry.size as usize);
@@ -68,7 +68,6 @@ impl Resources {
 
             result.resources.push(resource_entry);
         }
-
         Ok(Some(result))
     }
 }
