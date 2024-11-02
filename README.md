@@ -12,7 +12,7 @@ Provides some information on PE and ELF files.
 ### Add the lib to your project
 ```toml
 [dependencies]
-bininfo = "0.4.2"
+bininfo = "0.4.3"
 ```
 
 ### Example
