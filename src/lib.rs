@@ -1,3 +1,5 @@
+extern crate core;
+
 use crate::{
     elf::ElfFileInformation,
     entry_point::EntryPoint,

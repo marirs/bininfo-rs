@@ -1,9 +1,7 @@
-use exe::{PETranslation, ResolvedDirectoryID, ResourceDirectory, ResourceID};
 use exe::PE as PETrait;
+use exe::{PETranslation, ResolvedDirectoryID, ResourceDirectory, ResourceID};
 use goblin::pe::PE;
 use serde::{Deserialize, Serialize};
-
-use super::PeFileInformation;
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, PartialOrd, Ord, Eq)]
 pub struct ResourceEntry {

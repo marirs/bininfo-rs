@@ -27,6 +27,7 @@ impl Imports {
             pe.0.imports
                 .iter()
                 .fold(HashMap::new(), |mut acc, import| {
+                    #[allow(clippy::unwrap_or_default)]
                     let entr = acc.entry(import.dll).or_insert(vec![]);
                     entr.push(if import.ordinal > 0 {
                         ImportFunction {

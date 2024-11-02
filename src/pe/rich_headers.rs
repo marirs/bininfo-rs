@@ -445,6 +445,7 @@ impl<'a> RichStructure<'a> {
             dest[n * 2 + 4] = RICH_MARKER;
             dest[n * 2 + 5] = xor_key;
             // Write the padding
+            #[allow(clippy::needless_range_loop)]
             for i in n * 2 + 6..dest.len() {
                 dest[i] = 0;
             }

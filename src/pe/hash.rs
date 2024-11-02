@@ -1,7 +1,5 @@
-use md5::{Digest, Md5};
+use crypto::{digest::Digest, md5::Md5, sha1::Sha1, sha2::Sha256};
 use serde::{Deserialize, Serialize};
-use sha1::Sha1;
-use sha2::Sha256;
 
 pub trait HashData {
     /// Produce an MD5 hash.
@@ -14,18 +12,20 @@ pub trait HashData {
 impl HashData for [u8] {
     fn md5(&self) -> Vec<u8> {
         let mut hash = Md5::new();
-        hash.update(self);
-        hash.finalize().as_slice().iter().cloned().collect()
+        hash.input(self); // Update the hash input with the byte slice
+        hash.result_str().as_bytes().to_vec() // Convert to Vec<u8>
     }
+
     fn sha1(&self) -> Vec<u8> {
         let mut hash = Sha1::new();
-        hash.update(self);
-        hash.finalize().as_slice().iter().cloned().collect()
+        hash.input(self); // Update the hash input with the byte slice
+        hash.result_str().as_bytes().to_vec() // Convert to Vec<u8>
     }
+
     fn sha256(&self) -> Vec<u8> {
         let mut hash = Sha256::new();
-        hash.update(self);
-        hash.finalize().as_slice().iter().cloned().collect()
+        hash.input(self); // Update the hash input with the byte slice
+        hash.result_str().as_bytes().to_vec() // Convert to Vec<u8>
     }
 }
 
