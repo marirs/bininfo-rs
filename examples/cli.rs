@@ -10,7 +10,10 @@ fn main() -> Result<()> {
     let res = bininfo::get_file_extended_information(&argv[1])?;
 
     if argv.len() > 3 && argv[2] == "--json" {
-        println!("{}", serde_json::to_string_pretty(&res)?);
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&res).expect("JSON serialization failed")
+        );
         return Ok(());
     }
 
@@ -348,7 +351,7 @@ fn no_data_available(tbl: &mut Table) {
         "NO DATA",
         Alignment::CENTER,
     )
-        .with_hspan(2)
-        .with_style(Attr::Bold)
-        .with_style(Attr::ForegroundColor(color::BLUE))]));
+    .with_hspan(2)
+    .with_style(Attr::Bold)
+    .with_style(Attr::ForegroundColor(color::BLUE))]));
 }

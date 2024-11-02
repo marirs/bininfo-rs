@@ -7,7 +7,7 @@ use crate::{
     sections::SectionTable,
     Result,
 };
-use exe::VecPE;
+use goblin::pe::PE;
 use serde::Serialize;
 
 pub mod hash;
@@ -31,10 +31,10 @@ pub struct PeFileInformation {
 }
 
 impl PeFileInformation {
-    pub fn parse(pe: &VecPE) -> Result<PeFileInformation> {
+    pub fn parse(pe: (&PE, &[u8])) -> Result<PeFileInformation> {
         Ok(PeFileInformation {
             entry_point: EntryPoint::try_from(pe)?,
-            hashes: Hashes::parse(pe),
+            hashes: Hashes::parse(pe.1),
             signature: PeAuthenticodes::parse(pe)?,
             rich_headers: RichTable::parse(pe),
             section_table: SectionTable::try_from(pe)?,

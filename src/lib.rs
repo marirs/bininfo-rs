@@ -1,3 +1,5 @@
+extern crate core;
+
 use crate::{
     elf::ElfFileInformation,
     entry_point::EntryPoint,
@@ -8,7 +10,6 @@ use crate::{
     },
     sections::SectionTable,
 };
-use exe::VecPE;
 use serde::{Deserialize, Serialize};
 use std::{fs::read, path::Path};
 
@@ -88,13 +89,9 @@ pub fn get_file_extended_information<P: AsRef<Path>>(file_path: P) -> Result<Bin
         return Err(Error::FileNotFound);
     }
     let payload = read(file_path)?;
-    let image = VecPE::from_disk_data(&payload);
-    if let Ok(pe) = PeFileInformation::parse(&image) {
-        Ok(pe.into())
-    } else {
-        match goblin::Object::parse(&payload)? {
-            goblin::Object::Elf(elf) => Ok(ElfFileInformation::parse(&elf)?.into()),
-            _ => Err(Error::UnsupportedFileType),
-        }
+    match goblin::Object::parse(&payload)? {
+        goblin::Object::Elf(elf) => Ok(ElfFileInformation::parse(&elf)?.into()),
+        goblin::Object::PE(pe) => Ok(PeFileInformation::parse((&pe, &payload))?.into()),
+        _ => Err(Error::UnsupportedFileType),
     }
 }

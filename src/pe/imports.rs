@@ -1,4 +1,7 @@
-use exe::{CCharString, ImageDirectoryEntry, ImportData, ImportDirectory, VecPE, PE};
+use std::collections::HashMap;
+
+//use exe::{CCharString, ImageDirectoryEntry, ImportData, ImportDirectory, VecPE, PE};
+use goblin::pe::PE;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -19,49 +22,37 @@ pub struct ImportEntry {
 }
 
 impl Imports {
-    pub fn parse<P: PE>(pe: &P) -> Result<Imports, exe::Error> {
-        let mut result = Imports::default();
-        let import_directory = match ImportDirectory::parse(pe) {
-            Ok(import_dir) => import_dir,
-            Err(_) => {
-                return Err(exe::Error::BadDirectory(ImageDirectoryEntry::Import));
-            }
-        };
-        for import in import_directory.descriptors {
-            let mut entry = ImportEntry::default();
-
-            entry.name = match import.get_name(pe) {
-                Ok(n) => match n.as_str() {
-                    Ok(s) => s.to_string().to_ascii_lowercase(),
-                    Err(e) => return Err(e),
-                },
-                Err(e) => return Err(e),
-            };
-
-            let import_entries = match import.get_imports(pe) {
-                Ok(import_entries) => import_entries,
-                Err(_) => {
-                    return Err(exe::Error::BadDirectory(ImageDirectoryEntry::Import));
-                }
-            };
-            for import_data in import_entries {
-                let function_name = match import_data {
-                    ImportData::Ordinal(x) => format!("Ordinal({x})"),
-                    ImportData::ImportByName(s) => s.to_string(),
-                };
-                let is_import_by_ordinal = matches!(import_data, ImportData::Ordinal(_));
-                entry.imports.push(ImportFunction {
-                    name: function_name,
-                    import_by_ordinal: is_import_by_ordinal,
-                });
-            }
-            result.modules.push(entry);
-        }
-        Ok(result)
+    pub fn parse(pe: (&PE, &[u8])) -> Result<Self, crate::Error> {
+        let modules =
+            pe.0.imports
+                .iter()
+                .fold(HashMap::new(), |mut acc, import| {
+                    #[allow(clippy::unwrap_or_default)]
+                    let entr = acc.entry(import.dll).or_insert(vec![]);
+                    entr.push(if import.ordinal > 0 {
+                        ImportFunction {
+                            name: format!("Ordinal({})", import.ordinal),
+                            import_by_ordinal: true,
+                        }
+                    } else {
+                        ImportFunction {
+                            name: import.name.to_string(),
+                            import_by_ordinal: false,
+                        }
+                    });
+                    acc
+                })
+                .into_iter()
+                .map(|(dll, funcs)| ImportEntry {
+                    name: dll.to_string(),
+                    imports: funcs,
+                })
+                .collect();
+        Ok(Self { modules })
     }
 }
 
-pub fn pimp(pe: &VecPE) -> Option<Imports> {
+pub fn pimp(pe: (&PE, &[u8])) -> Option<Imports> {
     match Imports::parse(pe) {
         Ok(imports) => Some(imports),
         Err(_) => None,

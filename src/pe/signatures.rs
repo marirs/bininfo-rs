@@ -1,98 +1,7 @@
-use authenticode::{
-    AttributeCertificateError, AttributeCertificateIterator, AuthenticodeSignature, PeOffsets,
-    PeTrait,
-};
+use authenticode::AuthenticodeSignature;
 use cms::signed_data::SignerIdentifier;
-use exe::{Address, VecPE, PE, RVA};
+use goblin::pe::PE;
 use serde::{Deserialize, Serialize};
-use std::mem;
-
-struct PEForParsing {
-    pe: VecPE,
-}
-
-impl PeTrait for PEForParsing {
-    fn data(&self) -> &[u8] {
-        self.pe.get_buffer().as_ref()
-    }
-
-    fn num_sections(&self) -> usize {
-        match self.pe.get_section_table() {
-            Ok(sec_tbl) => sec_tbl.len(),
-            Err(_) => 0,
-        }
-    }
-
-    fn section_data_range(
-        &self,
-        index: usize,
-    ) -> Result<std::ops::Range<usize>, authenticode::PeOffsetError> {
-        let Ok(sections) = self.pe.get_section_table() else {
-            return Err(authenticode::PeOffsetError);
-        };
-        let Some(section) = sections.get(index) else {
-            return Err(authenticode::PeOffsetError);
-        };
-        Ok(section.pointer_to_raw_data.0 as usize
-            ..(section.size_of_raw_data + section.pointer_to_raw_data.0) as usize)
-    }
-
-    fn certificate_table_range(
-        &self,
-    ) -> Result<Option<std::ops::Range<usize>>, authenticode::PeOffsetError> {
-        let security_dir = match self
-            .pe
-            .get_data_directory(exe::ImageDirectoryEntry::Security)
-        {
-            Ok(security_dir) => security_dir,
-            Err(_) => {
-                return Ok(None);
-            }
-        };
-        Ok(Some(
-            security_dir.virtual_address.0 as usize
-                ..(security_dir.virtual_address.0 + security_dir.size) as usize,
-        ))
-    }
-
-    fn offsets(&self) -> Result<PeOffsets, authenticode::PeOffsetError> {
-        // Hash from the security data directory to the end of the header.
-        let Ok(arch) = self.pe.get_arch() else {
-            return Err(authenticode::PeOffsetError);
-        };
-
-        let size_of_headers = match arch {
-            exe::Arch::X86 => mem::size_of::<exe::ImageNTHeaders32>(),
-            exe::Arch::X64 => mem::size_of::<exe::ImageNTHeaders64>(),
-        };
-
-        let Ok(security_dir) = self
-            .pe
-            .get_data_directory(exe::ImageDirectoryEntry::Security)
-        else {
-            return Err(authenticode::PeOffsetError);
-        };
-        let x: RVA = security_dir.virtual_address;
-        let Ok(offset) = x.as_offset(&self.pe) else {
-            return Err(authenticode::PeOffsetError);
-        };
-
-        let checksum = match arch {
-            exe::Arch::X86 => mem::size_of::<exe::ImageOptionalHeader32>() + 64,
-            exe::Arch::X64 => mem::size_of::<exe::ImageOptionalHeader64>() + 64,
-        };
-
-        Ok(PeOffsets {
-            check_sum: checksum,
-            after_check_sum: checksum + 4,
-
-            security_data_dir: offset.0 as usize,
-            after_security_data_dir: (offset.0 + security_dir.size) as usize,
-
-            after_header: size_of_headers,
-        })
-    }
-}
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, PartialOrd, Ord, Eq)]
 pub struct Identifier {
@@ -118,42 +27,23 @@ pub struct PeAuthenticodes {
 }
 
 impl PeAuthenticodes {
-    pub fn parse(pe: &VecPE) -> Result<PeAuthenticodes, AttributeCertificateError> {
-        let mut result = PeAuthenticodes { signatures: vec![] };
-        let security_dir = match pe.get_data_directory(exe::ImageDirectoryEntry::Security) {
-            Ok(security_dir) => security_dir,
-            Err(_) => return Ok(result),
-        };
-        if security_dir.virtual_address.0 == 0 {
-            return Ok(result);
-        } else {
-            let peparse = PEForParsing { pe: pe.clone() };
-            let sig_iterator = AttributeCertificateIterator::new(&peparse)?;
-            if let Some(sigs) = sig_iterator {
-                for (sig_id, sig) in sigs.enumerate() {
-                    match sig {
-                        Ok(s) => {
-                            if s.get_authenticode_signature().is_ok() {
-                                result
-                                    .signatures
-                                    .push(AuthenSig::from(s.get_authenticode_signature().unwrap()))
-                            }
+    pub fn parse(pe: (&PE, &[u8])) -> Result<PeAuthenticodes, crate::Error> {
+        let signatures =
+            pe.0.certificates
+                .iter()
+                .try_fold(vec![], |mut res, attribute_certificate| {
+                    res.push(
+                        authenticode::AttributeCertificate {
+                            revision: attribute_certificate.revision as u16,
+                            certificate_type: attribute_certificate.certificate_type as u16,
+                            data: attribute_certificate.certificate,
                         }
-                        Err(e) => {
-                            if let AttributeCertificateError::InvalidCertificateSize { size: _ } = e
-                            {
-                                return Err(AttributeCertificateError::InvalidCertificateSize {
-                                    size: sig_id as u32 + 1,
-                                });
-                            };
-                            return Err(e);
-                        }
-                    };
-                }
-            }
-        }
-
-        Ok(result)
+                        .get_authenticode_signature()?
+                        .into(),
+                    );
+                    Ok::<_, crate::Error>(res)
+                })?;
+        Ok(PeAuthenticodes { signatures })
     }
 }
 
