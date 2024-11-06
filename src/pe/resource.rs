@@ -26,7 +26,11 @@ pub struct Resources {
 impl Resources {
     pub fn parse(pe: (&PE, &[u8])) -> Result<Option<Resources>, crate::Error> {
         let image = exe::VecPE::from_disk_data(pe.1);
-        let rsrc = ResourceDirectory::parse(&image)?;
+        let rsrc = if let Ok(rsrc) = ResourceDirectory::parse(&image) {
+            rsrc
+        } else {
+            return Ok(None);
+        };
         let mut result: Resources = Resources {
             minor_version: rsrc.root_node.directory.minor_version,
             major_version: rsrc.root_node.directory.major_version,

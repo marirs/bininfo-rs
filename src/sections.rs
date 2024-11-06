@@ -40,7 +40,7 @@ impl TryFrom<(&PE<'_>, &[u8])> for SectionTable {
                 .position(|&c| c == b'\0')
                 .unwrap_or(sec.name.len());
             result.sections.push(Section {
-                name: String::from_utf8(sec.name[..nul_range_end].to_vec()).unwrap(),
+                name: String::from_utf8_lossy(&sec.name[..nul_range_end]).to_string(),
                 virt_addr: sec.virtual_address as u64,
                 virt_size: sec.virtual_size as u64,
                 raw_addr: sec.pointer_to_raw_data as u64,
