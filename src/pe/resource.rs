@@ -55,7 +55,7 @@ impl Resources {
 
             let data_entry = entry
                 .get_data_entry(&image)
-                .unwrap_or(&exe::ImageResourceDataEntry {
+                .unwrap_or(exe::ImageResourceDataEntry {
                     offset_to_data: exe::RVA(0),
                     size: 0,
                     code_page: 0,
